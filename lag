@@ -1,0 +1,57 @@
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+
+-- Anti Lagger
+local function HandleCharacter(Character)
+    local Animator = Character:WaitForChild("Humanoid"):WaitForChild("Animator")
+
+    Animator.AnimationPlayed:Connect(function(AnimationTrack)
+        AnimationTrack:AdjustSpeed(-math.huge)
+        AnimationTrack:Stop()
+    end)
+
+    for idx, AnimationTrack in Animator:GetPlayingAnimationTracks() do
+        AnimationTrack:AdjustSpeed(-math.huge)
+        AnimationTrack:Stop()
+    end
+end
+
+local function HandlePlayer(Player)
+    if Player == Players.LocalPlayer then
+        return
+    end
+
+    if Player.Character then
+        task.spawn(HandleCharacter, Player.Character)
+    end
+
+    Player.CharacterAdded:Connect(HandleCharacter)
+end
+
+for idx, Player in Players:GetChildren() do
+    HandlePlayer(Player)
+end
+
+Players.PlayerAdded:Connect(HandlePlayer)
+
+-- Lagger
+RunService.PostSimulation:Connect(function(deltaTimeSim)
+    local Character = Players.LocalPlayer.Character
+    local Humanoid = Character and Character:FindFirstChild("Humanoid")
+    local Animator = Humanoid and Humanoid:FindFirstChild("Animator")
+
+    if not (Humanoid and Animator) then
+        return
+    end
+
+    local Animation = Instance.new("Animation")
+
+    Animation.AnimationId = `http{HttpService:GenerateGUID()}=108713182294229`
+
+    local AnimationTrack = Animator:LoadAnimation(Animation)
+
+    AnimationTrack:Play(9e9, 9e9, 9e9)
+    RunService.PreRender:Wait()
+    AnimationTrack:AdjustSpeed(-math.huge)
+end)

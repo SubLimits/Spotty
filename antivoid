@@ -1,0 +1,4 @@
+local target = game:GetService("Players").LocalPlayer.PlayerScripts.Controllers.Character.AntiCheatController
+if target then
+    target:Destroy()
+end

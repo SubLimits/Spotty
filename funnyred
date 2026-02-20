@@ -1,0 +1,14 @@
+return function()
+    local targetPlayer = game.Players:FindFirstChild(getgenv().Username)
+    
+    while true do
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = targetPlayer.Character.HumanoidRootPart
+            local lookVector = rootPart.CFrame.LookVector
+            local behindCFrame = CFrame.new(rootPart.Position - (lookVector * 2.5))
+            
+            CFrame.new(CFrame.Position)
+        end
+        wait()
+    end
+end

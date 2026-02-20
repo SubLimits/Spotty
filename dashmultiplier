@@ -1,0 +1,4 @@
+local int = Instance.new("NumberValue")
+int.Parent = game.Players.LocalPlayer.Character.Info
+int.Value = 5
+int.Name = "DashMultiplier"
