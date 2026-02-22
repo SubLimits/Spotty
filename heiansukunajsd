@@ -1,0 +1,5 @@
+local args = {
+    "Heian Sukuna",
+    79534633251029
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Combat"):WaitForChild("SwitchCharacter"):FireServer(unpack(args))
