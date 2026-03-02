@@ -1,0 +1,122 @@
+pcall(function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Characters = workspace.Characters
+    
+    local removedStuns = {}
+    local isDomainTagActive = false
+    local currentCharacter = nil
+    
+    local function restoreStuns(character)
+        if not character then return end
+        
+        for i = #removedStuns, 1, -1 do
+            local stunClone = removedStuns[i]
+            if stunClone and stunClone:IsA("Instance") then
+                pcall(function()
+                    stunClone.Parent = character
+                end)
+            end
+        end
+        table.clear(removedStuns)
+    end
+    
+    local function removeCurrentStuns(character)
+        if not character then return end
+        
+        table.clear(removedStuns)
+        
+        for _, obj in ipairs(character:GetDescendants()) do
+            if obj.Name == "Stun" then
+                pcall(function()
+                    local parent = obj.Parent
+                    local grandparent = parent and parent.Parent
+                    
+                    if grandparent == character then
+                        local clone = obj:Clone()
+                        table.insert(removedStuns, clone)
+                        obj:Destroy()
+                    end
+                end)
+            end
+        end
+    end
+    
+    local function watchDomainTag(character)
+        if not character then return end
+        
+        local info = character:WaitForChild("Info", 5)
+        if not info then return end
+
+        local function checkDomainTag()
+            local domainTag = info:FindFirstChild("DomainTag")
+            local tagExists = domainTag and domainTag.Parent ~= nil
+            
+            if tagExists and not isDomainTagActive then
+                isDomainTagActive = true
+                removeCurrentStuns(character)
+                
+            elseif not tagExists and isDomainTagActive then
+                isDomainTagActive = false
+                restoreStuns(character)
+            end
+        end
+
+        checkDomainTag()
+
+        info.ChildAdded:Connect(function(child)
+            if child.Name == "DomainTag" then
+                task.wait() 
+                checkDomainTag()
+
+                child.AncestryChanged:Connect(function()
+                    task.wait() 
+                    checkDomainTag()
+                end)
+            end
+        end)
+        
+        local existingTag = info:FindFirstChild("DomainTag")
+        if existingTag then
+            existingTag.AncestryChanged:Connect(function()
+                task.wait()
+                checkDomainTag()
+            end)
+        end
+    end
+    
+    local function setupStunHandler(character)
+        if not character then return end
+        
+        currentCharacter = character
+        
+        watchDomainTag(character)
+        
+        character.DescendantAdded:Connect(function(obj)
+            if obj.Name ~= "Stun" then return end
+
+            local parent = obj.Parent
+            local grandparent = parent and parent.Parent
+            
+            if grandparent ~= character then return end
+
+            if isDomainTagActive then
+                pcall(function()
+                    local clone = obj:Clone()
+                    table.insert(removedStuns, clone)
+                    obj:Destroy()
+                end)
+            end
+        end)
+    end
+    
+    if LocalPlayer.Character then
+        setupStunHandler(LocalPlayer.Character)
+    end
+    
+    LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+        isDomainTagActive = false
+        table.clear(removedStuns)
+        setupStunHandler(newCharacter)
+    end)
+end)
