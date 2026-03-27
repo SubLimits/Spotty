@@ -1,20 +1,41 @@
 local S = game:GetService
 local RS, P = S("RunService"), S("Players").LocalPlayer
 local Chars = workspace:WaitForChild("Characters")
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Blissful4992/ESPs/main/UniversalSkeleton.lua"))()
 
 local NAME = "Dummy"
-local FILL, OUT = Color3.new(0,0,0), Color3.new(0,0,0)
+local Skeletons = {}
 
-local function addHighlight(m)
-	if not (m and m:IsA("Model")) or m:FindFirstChildWhichIsA("Highlight") then return end
-	local h = Instance.new("Highlight")
-	h.FillColor, h.OutlineColor, h.DepthMode, h.Parent = FILL, OUT, Enum.HighlightDepthMode.AlwaysOnTop, m
+local function addSkeleton(m)
+	if not (m and m:IsA("Model")) then return end
+	
+	local player = nil
+	for _, p in ipairs(game.Players:GetPlayers()) do
+		if p.Character == m then
+			player = p
+			break
+		end
+	end
+	
+	if not player then return end
+	
+	for _, skel in ipairs(Skeletons) do
+		if skel.Player == player then
+			return
+		end
+	end
+
+	local skeleton = Library:NewSkeleton(player, true)
+	table.insert(Skeletons, skeleton)
 end
 
 local function watch(m)
-	addHighlight(m)
+	addSkeleton(m)
 	coroutine.wrap(function()
-		while m.Parent do addHighlight(m) task.wait(1) end
+		while m.Parent do 
+			addSkeleton(m) 
+			task.wait(1) 
+		end
 	end)()
 end
 
@@ -25,6 +46,16 @@ end
 
 Chars.ChildAdded:Connect(function(c)
 	if c.Name == NAME then watch(c) end
+end)
+
+Chars.ChildRemoved:Connect(function(c)
+	for i, skeleton in ipairs(Skeletons) do
+		if skeleton.Player.Character == c then
+			skeleton:Remove()
+			table.remove(Skeletons, i)
+			break
+		end
+	end
 end)
 
 check()
