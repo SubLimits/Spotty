@@ -1,0 +1,22 @@
+local Knit = require(game:GetService("ReplicatedStorage").Knit.Knit)
+local hb = Knit.GetController("HitboxController")
+
+local old = hb.SphereHitbox
+
+hb.SphereHitbox = function(self, p, offset, sz)
+    local mult = 25 
+    local Size = sz * 2.5
+    
+    local data = old(self, p, offset, Size)
+    local res = {}
+    
+    if data and #data > 0 then
+        for _, v in pairs(data) do
+            for i = 1, mult do
+                table.insert(res, v)
+            end
+        end
+    end
+    
+    return res
+end
