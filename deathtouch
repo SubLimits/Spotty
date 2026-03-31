@@ -1,0 +1,51 @@
+local character = game.Players.LocalPlayer.Character
+
+while true do
+    character:GetAttributeChangedSignal("Ragdoll"):Wait()
+    
+    local value = character:GetAttribute("Ragdoll")
+    if value and value > 0 then
+        break
+    end
+end
+
+pcall(function()
+    getgenv().gethiddenproperty = gethiddenproperty or newcclosure(function(_Instance, _Property)
+    local x, UGCValidationService = pcall(game.GetService, game, "UGCValidationService")
+
+    if x then
+        local y, z = pcall(UGCValidationService.GetPropertyValue, UGCValidationService, _Instance, _Property)
+        
+        if y then
+            return z
+        end
+    end
+end)
+
+getgenv().sethiddenproperty = sethiddenproperty or newcclosure(function(_Instance, _Property, _Value)
+    local setscriptable = setscriptable
+
+    if setscriptable == nil then
+        return warn("setscriptable does not exist")
+    else
+        setscriptable(_Instance, _Property, true)
+        _Instance[_Property] = _Value
+        setscriptable(_Instance, _Property, false)
+    end
+end)
+end)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local Player = Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
+local RootPart = Humanoid and Humanoid.RootPart
+
+if Humanoid and RootPart then
+    while Player.Character == Character do
+        sethiddenproperty(Humanoid, "MoveDirectionInternal", Vector3.new(0/0))
+        task.wait()
+    end
+end
