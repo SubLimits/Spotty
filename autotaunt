@@ -1,0 +1,16 @@
+local player = game:GetService("Players").LocalPlayer
+local kills = player.leaderstats.Kills
+local remote = game:GetService("ReplicatedStorage").Knit.Knit.Services.JoinService.RE.Talk
+
+local args = {
+    [1] = 10173613362
+}
+
+local lastKills = kills.Value
+
+kills.Changed:Connect(function(newValue)
+    if newValue > lastKills then
+        remote:FireServer(unpack(args))
+        lastKills = newValue
+    end
+end)
