@@ -1,0 +1,4 @@
+local saves = game:GetService("Players").LocalPlayer.PlayerGui.BuildTools.Saves.Saves
+saves["4"].Visible = true
+saves["5"].Visible = true
+saves["6"].Visible = true
