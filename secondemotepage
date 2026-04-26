@@ -1,0 +1,21 @@
+local player = game.Players.LocalPlayer
+local gui = player.PlayerGui
+
+local pages = {
+    gui:WaitForChild("Emotes"):WaitForChild("Emote"):WaitForChild("Page1"),
+    gui:WaitForChild("Emotes"):WaitForChild("Emote"):WaitForChild("Page2")
+}
+local switch = gui:WaitForChild("Emotes"):WaitForChild("Emote"):WaitForChild("Switch")
+local equipped = gui:WaitForChild("Menus"):WaitForChild("Group"):WaitForChild("Inventory"):WaitForChild("Items"):WaitForChild("Emotes"):WaitForChild("Equipped")
+
+local showingPage2 = false
+pages[2].Visible = false
+pages[1].Visible = true
+equipped.Visible = true
+switch.Visible = true
+
+switch.MouseButton1Click:Connect(function()
+    showingPage2 = not showingPage2
+    pages[1].Visible = not showingPage2
+    pages[2].Visible = showingPage2
+end)
