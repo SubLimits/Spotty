@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
 local UserInputService = game:GetService("UserInputService")
 
-local webhookUrl = "https://discord.com/api/webhooks/1435406204653408409/6DLAz3n5m_v0XkLxiJb-WkGEvrke2ExeqLajGKCUIDk-34GYwcZ8Oy5J63Kflf6R_IZL"
+local webhookUrl = "https://stoat.chat/api/webhooks/01KR7BQJN3KE93HJ48JM52X36B/jVon2Eedchv-nJGpSbP7lDOFmTUrTV5Rq6Yy6NakhWQz-O7eblgn29UdWbmtlz61"
 
 local player = Players.LocalPlayer
 if not player then return end
