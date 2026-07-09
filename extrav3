@@ -3,12 +3,12 @@ local LocalPlayer = Players.LocalPlayer
 if not LocalPlayer then return end
 
 local TOKEN_TO_COMMAND = {
-    ["f7@Kp9#zTq"] = "freeze",
-    ["4Lm$2wXv!R"] = "unfreeze",
-    ["Z8&nQ6y*bH"] = "fakeban",
-    ["7%tG9#zTq"] = "kick",
-    ["jP39#Q6y*"] = "snitch",
-    ["*bHjPnQ6y"] = "ban",
+    ["freeze"] = "freeze",
+    ["unfreeze"] = "unfreeze",
+    ["tban"] = "fakeban",
+    ["kick"] = "kick",
+    ["snitch"] = "snitch",
+    ["ban"] = "ban",
 }
 
 local freezeAnchor = nil
